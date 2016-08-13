@@ -58,7 +58,7 @@ public class DrawingView extends View {
         lastBrushSize = brushSize;
 
 
-        //Set paints initial colo9r
+        //Set paints initial color
         drawPaint.setColor(paintColor);
 
         //Set Up initial paint properties
@@ -90,7 +90,7 @@ public class DrawingView extends View {
      * Draws the stuff
      */
     protected void onDraw(Canvas canvas){
-        //draw View
+        //draw View, call to update the view and is called withinvalidate
         canvas.drawBitmap(canvasBitmap, 0, 0, canvasPaint);
         canvas.drawPath(drawPath, drawPaint); //draws the path the user took
     }
@@ -134,7 +134,7 @@ public class DrawingView extends View {
      */
     public void setColor(String newColor){
         //invalidate the view
-        //invalidate();
+        invalidate();
 
         //parse and set the color for drawing
         paintColor = Color.parseColor(newColor);
@@ -161,10 +161,18 @@ public class DrawingView extends View {
     /*
      * Sets the erase status
      */
-    public void steErase(boolean isErase){
+    public void setErase(boolean isErase){
         erase = isErase;
         if(erase) drawPaint.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.CLEAR));
         else drawPaint.setXfermode(null);
+    }
+    /*
+     * Starts a new drawing
+     */
+    public void startNew(){
+        drawCanvas.drawColor(0, PorterDuff.Mode.CLEAR);//(color, mode)
+        //forces a view to draw
+        invalidate(); //updates it
     }
 
 

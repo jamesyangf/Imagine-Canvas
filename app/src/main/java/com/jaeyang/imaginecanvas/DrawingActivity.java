@@ -5,25 +5,30 @@ package com.jaeyang.imaginecanvas;
 
 
 import android.app.Dialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.database.Cursor;
+import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.provider.MediaStore;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.view.LayoutInflater;
 import android.view.View;
+import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.Toast;
 
 import java.io.FileNotFoundException;
+import java.util.UUID;
 
 public class DrawingActivity extends AppCompatActivity implements View.OnClickListener{
     private DrawingView drawView;
-    private ImageButton currPaint, brushBtn, eraseBtn; //the current paint view
+    private ImageButton currPaint, brushBtn, eraseBtn, newBtn, saveBtn; //the current paint view
     //three dimension values
     private float smallBrush, mediumBrush, largeBrush;
 
@@ -42,6 +47,10 @@ public class DrawingActivity extends AppCompatActivity implements View.OnClickLi
         brushBtn.setOnClickListener(this);
         eraseBtn = (ImageButton) findViewById(R.id.erase_btn);
         eraseBtn.setOnClickListener(this);
+        newBtn = (ImageButton) findViewById(R.id.new_btn);
+        newBtn.setOnClickListener(this);
+        saveBtn = (ImageButton) findViewById(R.id.save_btn);
+        saveBtn.setOnClickListener(this);
 
         //instantiate them
         smallBrush = getResources().getInteger(R.integer.small_size);
@@ -80,7 +89,6 @@ public class DrawingActivity extends AppCompatActivity implements View.OnClickLi
     /*
      * Loads the image when you choose it
      */
-
     public void loadImagefromGallery(View view) {
         // Create intent to Open Image applications like Gallery, Google Photos
         Intent galleryIntent = new Intent(Intent.ACTION_PICK,
@@ -97,8 +105,8 @@ public class DrawingActivity extends AppCompatActivity implements View.OnClickLi
                     && null != data) {
                 // Get the Image from data
 
-                Uri selectedImage = data.getData();
-                String[] filePathColumn = { MediaStore.Images.Media.DATA };
+                Uri selectedImage = data.getData(); //gets the data from the intent
+                String[] filePathColumn = { MediaStore.Images.Media.DATA }; //also file name
 
                 // Get the cursor
                 Cursor cursor = getContentResolver().query(selectedImage,
@@ -135,7 +143,7 @@ public class DrawingActivity extends AppCompatActivity implements View.OnClickLi
             brushDialog.setContentView(R.layout.brush_chooser); //choose the layout you want your dialog to be
 
 
-            brushDialog.show();
+
 
             ImageButton smallBtn = (ImageButton)brushDialog.findViewById(R.id.small_brush);
             smallBtn.setOnClickListener(new View.OnClickListener(){
@@ -165,12 +173,71 @@ public class DrawingActivity extends AppCompatActivity implements View.OnClickLi
                     brushDialog.dismiss();
                 }
             });
+            brushDialog.show();
 
         }else if(view.getId()==R.id.erase_btn){
-            final AlertDialog.Builder brushDialog = new AlertDialog.Builder(this);
-            brushDialog.setTitle("Eraser size:");
-            brushDialog.setView(R.layout.brush_chooser);
+            final Dialog brushDialog = new Dialog(this);
+
+            brushDialog.setTitle("Brush size: ");
+            brushDialog.setContentView(R.layout.brush_chooser); //choose the layout you want your dialog to be
+
             brushDialog.show();
+        }else if(view.getId() == R.id.new_btn){
+            //happens when the new button is pressed
+            AlertDialog.Builder newDialog = new AlertDialog.Builder(this);
+            newDialog.setTitle("New drawing");
+            newDialog.setMessage("Start new drawing \n(you will lose the current drawing)?");
+            newDialog.setPositiveButton("Yes", new DialogInterface.OnClickListener(){
+                public void onClick(DialogInterface dialog, int which){
+                    drawView.startNew();
+                    dialog.dismiss();
+                }
+            });
+            newDialog.setNegativeButton("Cancel", new DialogInterface.OnClickListener(){
+                public void onClick(DialogInterface dialog, int which){
+                    dialog.cancel();
+                }
+            });
+            newDialog.show();
+        }else if(view.getId() == R.id.save_btn){
+            AlertDialog.Builder saveDialog = new AlertDialog.Builder(this);
+            saveDialog.setTitle("Save drawing");
+            saveDialog.setMessage("Save drawing to device Gallery?");
+            saveDialog.setPositiveButton("Yes", new DialogInterface.OnClickListener(){
+                public void onClick(DialogInterface dialog, int which){
+                    //save drawing
+                    //enable the view to be saved as a bitmap in a cache
+                    drawView.setDrawingCacheEnabled(true);
+                    //Write the image to a file
+                    Bitmap viewBitMap = drawView.getDrawingCache();
+                    //MediaStore is the provider
+                    //Saves the images in the gallery, this is set to imgSaved
+                    String imgSaved = MediaStore.Images.Media.insertImage(
+                            getContentResolver(), viewBitMap, UUID.randomUUID().toString()+".png", "drawing");
+
+                    //Toast that gives user feedback on opening the app
+                    if(imgSaved!=null){ //if img is saved
+                        Toast savedToast = Toast.makeText(getApplicationContext(),
+                                "Drawing saved to Gallery!", Toast.LENGTH_SHORT);
+                        savedToast.show();
+                    }
+                    else{
+                        Toast unsavedToast = Toast.makeText(getApplicationContext(),
+                                "Oops! Image could not be saved.", Toast.LENGTH_SHORT);
+                        unsavedToast.show();
+                    }
+
+                    //Destroy the cache so future drawings saved wont use existing cache
+                    drawView.destroyDrawingCache();
+
+                }
+            });
+            saveDialog.setNegativeButton("Cancel", new DialogInterface.OnClickListener(){
+                public void onClick(DialogInterface dialog, int which){
+                    dialog.cancel();
+                }
+            });
+            saveDialog.show();
         }
     }
 
