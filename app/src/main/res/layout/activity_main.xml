@@ -11,12 +11,19 @@
     tools:context="com.jaeyang.imaginecanvas.MainActivity">
 
     <TextView
+        android:id="@+id/free_draw"
+        style="@style/CategoryStyle"
+        android:background="@color/category_drawing"
+        android:text="@string/category_phrases"
+        android:onClick="freeDrawClicked"/>
+    <TextView
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Hello World!" />
-    <Button
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Go to Drawing"
-        android:onClick="buttonClicked"/>
+        android:layout_height="wrap_content" />
+    <TextView
+        android:id="@+id/about"
+        style="@style/CategoryStyle"
+        android:background="@color/category_drawing"
+        android:text="About"
+        android:onClick="aboutClicked"/>
+
 </LinearLayout>

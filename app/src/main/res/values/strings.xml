@@ -11,4 +11,7 @@
     <string name="med">Medium</string>
     <string name="lrg">Large</string>
 
+    <!-- Category name for phrases [CHAR LIMIT=20] -->
+    <string name="category_phrases">Free-For-Draw</string>
+
 </resources>

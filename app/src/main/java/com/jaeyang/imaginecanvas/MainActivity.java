@@ -21,10 +21,15 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
     }
 
-    public void buttonClicked(View view){
+    public void freeDrawClicked(View view){
         Intent drawingActivity = new Intent(MainActivity.this,DrawingActivity.class);
         startActivity(drawingActivity);
 
+    }
+
+    public void aboutClicked(View view){
+        Intent aboutActivity = new Intent(MainActivity.this, AboutActivity.class);
+        startActivity(aboutActivity);
     }
 
 

@@ -11,4 +11,7 @@
     <dimen name="large_brush">30dp</dimen> <!-- For XML-->
     <integer name="large_size">30</integer><!-- For java code-->
 
+    <!-- Height of each list item -->
+    <dimen name="list_item_height">88dp</dimen>
+
 </resources>

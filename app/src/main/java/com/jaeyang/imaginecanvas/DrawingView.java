@@ -10,6 +10,7 @@ import android.graphics.Paint;
 import android.graphics.Path;
 import android.graphics.PorterDuff;
 import android.graphics.PorterDuffXfermode;
+import android.graphics.Rect;
 import android.net.Uri;
 import android.util.AttributeSet;
 import android.util.TypedValue;
@@ -29,7 +30,7 @@ public class DrawingView extends View {
     private Paint drawPaint, canvasPaint; //two types of drawing, the user and whats on the canvas
     //initial paint color
     private int paintColor = 0xFF000000;
-    //the canvas,defines the shape
+    //the canvas, holds the draw calls, writing into bitmap, host the bittmap
     private Canvas drawCanvas;
     //canvas bitmap, the actual canvas to be drawn on
     private Bitmap canvasBitmap;
@@ -91,7 +92,7 @@ public class DrawingView extends View {
      */
     protected void onDraw(Canvas canvas){
         //draw View, call to update the view and is called withinvalidate
-        canvas.drawBitmap(canvasBitmap, 0, 0, canvasPaint);
+        canvas.drawBitmap(canvasBitmap,0 , 0, canvasPaint);
         canvas.drawPath(drawPath, drawPaint); //draws the path the user took
     }
 
@@ -127,6 +128,14 @@ public class DrawingView extends View {
         invalidate(); //if view is visible, onDraw will be called
         return true;
 
+    }
+
+    /*
+     * This sets the Canvas Bitamp
+     */
+    public void setCanvasBitmap(Bitmap bitmap){
+        canvasBitmap = bitmap;
+        invalidate();
     }
 
     /*
@@ -166,12 +175,14 @@ public class DrawingView extends View {
         if(erase) drawPaint.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.CLEAR));
         else drawPaint.setXfermode(null);
     }
+
     /*
      * Starts a new drawing
      */
     public void startNew(){
         drawCanvas.drawColor(0, PorterDuff.Mode.CLEAR);//(color, mode)
         //forces a view to draw
+        //canvasBitmap = null;
         invalidate(); //updates it
     }
 

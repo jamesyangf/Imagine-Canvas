@@ -15,11 +15,8 @@ import android.provider.MediaStore;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.view.LayoutInflater;
 import android.view.View;
-import android.widget.Button;
 import android.widget.ImageButton;
-import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.Toast;
 
@@ -92,7 +89,7 @@ public class DrawingActivity extends AppCompatActivity implements View.OnClickLi
     public void loadImagefromGallery(View view) {
         // Create intent to Open Image applications like Gallery, Google Photos
         Intent galleryIntent = new Intent(Intent.ACTION_PICK,
-                android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
+                MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
         // Start the Intent
         startActivityForResult(galleryIntent, RESULT_LOAD_IMG);
     }
@@ -110,17 +107,22 @@ public class DrawingActivity extends AppCompatActivity implements View.OnClickLi
 
                 // Get the cursor
                 Cursor cursor = getContentResolver().query(selectedImage,
-                        filePathColumn, null, null, null);
+                        filePathColumn, null, null, null); //Query the given URI, returning a Cursor over the result set.
                 // Move to first row
                 cursor.moveToFirst();
 
+                //Gets the first item that is saved in the cursor
                 int columnIndex = cursor.getColumnIndex(filePathColumn[0]);
-                imgDecodableString = cursor.getString(columnIndex);
+                imgDecodableString = cursor.getString(columnIndex); // gets the filepath of it as a string
                 cursor.close();
-                ImageView imgView = (ImageView) findViewById(R.id.imgView);
+
+                Bitmap imageBitmap = BitmapFactory.decodeFile(imgDecodableString);//decode a filePath into a bitmap
+                drawView = (DrawingView) findViewById(R.id.drawing);
+                //Resize the bitmap
+                imageBitmap = Bitmap.createScaledBitmap(imageBitmap, drawView.getWidth(), drawView.getHeight(), false);
                 // Set the Image in ImageView after decoding the String
-                imgView.setImageBitmap(BitmapFactory
-                        .decodeFile(imgDecodableString));
+                drawView.setCanvasBitmap(imageBitmap);//BitmapFactory: Creates Bitmap objects from various sources, including files, streams, and byte-arrays.
+
 
             } else {
                 Toast.makeText(this, "You haven't picked Image",
